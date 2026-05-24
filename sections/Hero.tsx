@@ -18,7 +18,7 @@ const HOLD_PX = 600
 
 const FRAME_PATHS: string[] = Array.from({ length: TOTAL_FRAMES }, (_, i) => {
   const n = String(i).padStart(3, '0')
-  return `/ezgif-split/frame_${n}_delay-0.042s.png`
+  return `/ezgif-split/frame_${n}_delay-0.042s.webp`
 })
 
 // ── object-fit: contain helper for canvas ───────────────────────
@@ -82,6 +82,7 @@ export default function Hero() {
   )
   const [loadedCount, setLoadedCount] = useState(0)
   const [allLoaded, setAllLoaded] = useState(false)
+  const [firstFrameReady, setFirstFrameReady] = useState(false)
   const currentFrameRef = useRef(0)
 
   const { scrollYProgress } = useScroll({
@@ -127,8 +128,8 @@ export default function Hero() {
       img.onload = () => {
         count++
         setLoadedCount(count)
-        // Draw the very first frame as soon as it's ready
-        if (i === 0) drawFrame(0)
+        // Draw the very first frame as soon as it's ready and show hero
+        if (i === 0) { drawFrame(0); setFirstFrameReady(true) }
         if (count === TOTAL_FRAMES) setAllLoaded(true)
       }
       img.onerror = () => {
@@ -190,9 +191,9 @@ export default function Hero() {
         {/* ── Preload progress overlay ─────────────────────── */}
         <motion.div
           className="absolute inset-0 z-50 bg-black flex flex-col items-center justify-end pb-16 gap-3"
-          animate={{ opacity: allLoaded ? 0 : 1 }}
+          animate={{ opacity: firstFrameReady ? 0 : 1 }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          style={{ pointerEvents: allLoaded ? 'none' : 'auto' }}
+          style={{ pointerEvents: firstFrameReady ? 'none' : 'auto' }}
         >
           <span className="text-[10px] tracking-[0.2em] uppercase text-white/25 font-medium">
             Loading
