@@ -43,9 +43,6 @@ temporary screenshots/
 Screenshot*.png
 Screenshot_to_fix/
 
-# Large asset folders (optional — remove if you want these in git)
-ezgif-split/
-
 # PDFs (remove this line if you want your resume in the repo)
 # *.pdf
 
