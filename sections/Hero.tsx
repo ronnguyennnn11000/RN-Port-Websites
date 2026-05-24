@@ -83,6 +83,8 @@ export default function Hero() {
   const [loadedCount, setLoadedCount] = useState(0)
   const [allLoaded, setAllLoaded] = useState(false)
   const [firstFrameReady, setFirstFrameReady] = useState(false)
+  // Tracks which frame indices have finished loading
+  const loadedFramesRef = useRef<Set<number>>(new Set())
   const currentFrameRef = useRef(0)
 
   const { scrollYProgress } = useScroll({
@@ -97,8 +99,21 @@ export default function Hero() {
   // ── Draw a single frame to canvas ───────────────────────────
   const drawFrame = useCallback((index: number) => {
     const canvas = canvasRef.current
-    const img = imagesRef.current[index]
-    if (!canvas || !img || !img.complete || !img.naturalWidth) return
+    if (!canvas) return
+
+    // If the target frame isn't loaded yet, walk backwards to find
+    // the nearest already-loaded frame so animation never freezes
+    const loaded = loadedFramesRef.current
+    let best = index
+    if (!loaded.has(index)) {
+      for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
+        if (index - offset >= 0 && loaded.has(index - offset)) { best = index - offset; break }
+        if (index + offset < TOTAL_FRAMES && loaded.has(index + offset)) { best = index + offset; break }
+      }
+    }
+
+    const img = imagesRef.current[best]
+    if (!img || !img.complete || !img.naturalWidth) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     drawCover(ctx, img, canvas.offsetWidth, canvas.offsetHeight)
@@ -127,9 +142,11 @@ export default function Hero() {
       const img = new Image()
       img.onload = () => {
         count++
+        loadedFramesRef.current.add(i)
         setLoadedCount(count)
-        // Draw the very first frame as soon as it's ready and show hero
         if (i === 0) { drawFrame(0); setFirstFrameReady(true) }
+        // If this frame is where the user is currently scrolled, redraw now
+        if (i === currentFrameRef.current) drawFrame(i)
         if (count === TOTAL_FRAMES) setAllLoaded(true)
       }
       img.onerror = () => {
