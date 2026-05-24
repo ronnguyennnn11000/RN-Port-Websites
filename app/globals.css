@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens ─────────────────────────────────────────── */
+:root {
+  --color-bg:      #000000;
+  --color-fg:      #FFFFFF;
+  --color-accent:  #FF5E19;
+  --color-accent-hover: #E54D0A;
+
+  /* Elevation / surface layers */
+  --surface-base:     #000000;
+  --surface-elevated: #0d0d0d;
+  --surface-floating: #161616;
+
+  /* Typography scale */
+  --tracking-tight: -0.03em;
+  --leading-body:   1.7;
+
+  /* Spacing tokens */
+  --space-section: clamp(5rem, 10vw, 8rem);
+}
+
+/* ── Base reset ────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  body {
+    font-family: var(--font-inter), sans-serif;
+    line-height: var(--leading-body);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Heading defaults — tight tracking */
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.1;
+    font-weight: 700;
+  }
+
+  /* Selection highlight uses accent */
+  ::selection {
+    background-color: var(--color-accent);
+    color: #ffffff;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--surface-base);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 2px;
+  }
+
+  /* Focus ring — accent color */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+}
+
+/* ── Marquee animation ─────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── Utility classes ───────────────────────────────────────── */
+@layer utilities {
+  .text-accent  { color: var(--color-accent); }
+  .bg-elevated  { background-color: var(--surface-elevated); }
+  .bg-floating  { background-color: var(--surface-floating); }
+
+  .section-padding {
+    padding-block: var(--space-section);
+  }
+
+  /* Grain / noise texture overlay */
+  .noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    border-radius: inherit;
+  }
+}
